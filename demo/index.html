@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Untitled Document</title>
+</head>
+
+<body>
+<form id="new_account" action="/account/create/index.php" method="post">
+	<h2>Add Account</h2>
+    <input type="text" name="name" value="" placeholder="Your Name" /><br />
+	<input type="hidden" name="api_key" value="{TQ$4oYQhLb9Z20-1a0jG;kK8;=3DY" />
+	<input type="submit" value="Create Account">
+</form>
+<hr / >
+<div id="account">
+<h1 id="welcome"></h1>
+<form id="new_user" action="/user/create/index.php" method="post">
+	<h2>Add User</h2>
+    <input type="text" name="name" value="" placeholder="Name" /><br />
+    <input type="text" name="phone" value="" placeholder="Phone Number" /><br />
+	<input type="hidden" name="api_key" value="" />
+    <input type="hidden" name="acct_id" value="" />
+	<input type="submit" value="Create User">
+</form>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<script>
+var Maggie = {
+	
+	init: function(){
+		
+		Maggie.forms.init();
+		
+		Maggie.forms.update();
+	},
+	
+	forms: {
+		
+		init:function(){
+			
+			jQuery('body').on( 'submit' , 'form' , function( event ){event.preventDefault(); Maggie.forms.add_acct( jQuery( this ) ) });
+			
+		},
+		
+		add_acct:function( form ){
+			
+			alert('fire');
+			
+			var data = form.serialize();
+			
+			jQuery.post(
+				form.attr('action'),
+				data,
+				function( response ){
+					
+					if ( form.attr('id') == 'new_user' ){
+					} else {
+					}
+					
+					alert( response );
+					
+					//Maggie.local.update( response );
+					
+					//Maggie.forms.update();
+					
+				}//,'json'
+			);	
+			
+		},
+		
+		update:function(){
+			
+			var api_key = ( 'api_key' in localStorage ) ? localStorage.api_key: '';
+			
+			var user_name = ( 'user_name' in localStorage ) ? localStorage.user_name: '';
+			
+			var acct_id = ( 'acct_id' in localStorage ) ? localStorage.acct_id: '';
+			
+			jQuery('#account').find( 'input[name="api_key"]' ).val( api_key  );
+			
+			jQuery('#account').find( 'input[name="acct_id"]' ).val( acct_id );
+			
+			//if ( user_name ){
+			
+				//jQuery('#welcome').html('Welcome ' + user_name );
+				
+			//} // end if
+			
+		},
+		
+	},
+	
+	local : {
+		
+		update: function( response ){
+			
+			if( 'user_name' in response ) {
+				
+				localStorage.setItem( 'user_name' , response.user_name );
+				
+			} // end if
+			
+			if( 'api_key' in response ) {
+				
+				localStorage.setItem( 'api_key' , response.api_key );
+				
+			} // end if
+			
+			if( 'acct_id' in response ) {
+				
+				localStorage.setItem( 'acct_id' , response.acct_id );
+				
+			} // end if
+			
+			if( 'acct_id' in response ) {
+				
+				localStorage.setItem( 'acct_id' , response.acct_id );
+				
+			} // end if
+			
+			if( 'users' in response ){
+				
+				
+				
+			} // end if
+			
+			
+		} // end updated
+		
+	}
+
+}
+Maggie.init();
+</script>
+</body>
+</html>
