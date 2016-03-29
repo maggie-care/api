@@ -31,7 +31,7 @@ class Account_Create {
 			
 			$user->create_user( $this->account->get_acct_id() , $this->account->get_api_key() , $user_settings );
 		
-			$data['account'] = $this->account->get_account_array();
+			$data['account'] = $this->account->get_account_array( $user->get_user_id() );
 			
 			$data['users'][] = $user->get_user_array();
 		

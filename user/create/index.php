@@ -32,6 +32,8 @@ class User_Create {
 			$user_info['name'] = $this->user->get_name();
 			
 			$user_info['phone'] = $this->user->get_phone();
+			
+			$user_info['role_id'] = $this->user->get_role_id();
 		
 		} // end if
 		

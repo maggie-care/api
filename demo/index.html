@@ -3,36 +3,376 @@
 <head>
 <meta charset="utf-8">
 <title>Untitled Document</title>
-</head>
-
-<body>
-<form id="new_account" action="/account/create/index.php" method="post">
-	<h2>Add Account</h2>
-    <input type="text" name="name" value="" placeholder="Your Name" /><br />
-	<input type="hidden" name="api_key" value="{TQ$4oYQhLb9Z20-1a0jG;kK8;=3DY" />
-	<input type="submit" value="Create Account">
-</form>
-<hr / >
-<div id="account">
-<h1 id="welcome"></h1>
-<form id="new_user" action="/user/create/index.php" method="post">
-	<h2>Add User</h2>
-    <input type="text" name="name" value="" placeholder="Name" /><br />
-    <input type="text" name="phone" value="" placeholder="Phone Number" /><br />
-	<input type="hidden" name="api_key" value="" />
-    <input type="hidden" name="acct_id" value="" />
-	<input type="submit" value="Create User">
-</form>
-</div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 <script>
-var Maggie = {
+jQuery( document ).ready( function(){
 	
-	init: function(){
+	jQuery('body').on('click','.clear-account',function( event ){
+		
+		event.preventDefault();
+		
+		localStorage.removeItem('account');
+		
+		localStorage.removeItem('users');
+		
+		location.reload();
+		
+	})
+	
+});
+
+var Account = function(){
+	
+	this.api_create_url = 'http://api.maggie.care/account/create/index.php'; 
+	
+	this.acct_id = false;
+	
+	this.owner_id = false;
+	
+	this.api_key = false;
+	
+	this.salt = false;
+	
+	this.acct_data = false;
+	
+	
+	var self = this;
+	
+	this.get_api_create_url = function(){ return self.api_create_url }
+	this.get_acct_id = function(){ return self.acct_id }
+	this.get_api_key = function(){ return self.api_key }
+	this.get_salt = function(){ return self.salt }
+	this.get_owner_id = function(){ return self.owner_id }
+	this.get_acct_data = function(){ return self.acct_data;}
+	
+	this.save = function( acct ){
+		
+		localStorage.setItem( 'account' , JSON.stringify( acct ) );
+		
+	} // end save
+	
+	this.set_acct = function(){
+		
+		if ( 'account'  in localStorage ){
+		
+			console.log( localStorage.account )
+			
+			var acct = JSON.parse( localStorage.account );
+			
+			if ( 'acct_id' in acct ) self.acct_id = acct.acct_id;
+			
+			if ( 'api_key' in acct ) self.api_key = acct.api_key;
+			
+			if ( 'salt' in acct ) self.salt = acct.salt;
+			
+			if ( 'owner_id' in acct ) self.owner_id = acct.owner_id;
+		
+		} // end if
+		
+	} // end set
+	
+	this.create = function( data , maggie ){
+		
+		jQuery.post(
+			self.get_api_create_url(),
+			data,
+			function( response ){
+				
+				self.acct_data = response;
+				
+				self.save( response.account );
+				
+				self.set_acct();
+				
+				maggie.users.save_user( response.users[0] );
+				
+				location.reload();
+				
+			},'json'
+		);	
+		
+	}
+	
+} // end account
+
+
+var User = function(){
+	
+	this.user_id = false;
+	
+	this.name = false;
+	
+	this.api_key = false;
+	
+	this.role_id = false;
+	
+	var self = this;
+	
+	this.get_user_id = function(){ return self.user_id }
+	this.get_name = function(){ return self.name }
+	this.get_api_key = function(){ return self.api_key }
+	this.get_role_id = function(){ return self.role_id }   
+	
+	this.set_user = function( user ){
+		
+		if ( user ){
+		
+			if ( 'user_id' in user ) self.user_id = user.user_id;
+			
+			if ( 'name' in user ) self.name = user.name;
+			
+			if ( 'api_key' in user ) self.api_key = user.api_key;
+			
+			if ( 'role_id' in user ) self.role_id = user.role_id;
+		
+		}
+		
+	} // end set
+	
+	this.create = function(){
+		
+	}
+	
+} // end account
+
+var Users = function(){
+	
+	this.users = [];
+	
+	var self = this; 
+	
+	this.get_users = function(){ return self.users }
+	
+	this.set_users = function(){
+		
+		if ( 'users'  in localStorage ){
+			
+			self.users = JSON.parse( localStorage.getItem( 'users' ) );
+			
+		} //end if
+		
+	} // end this users
+	
+	this.save_user = function( user_data ){
+		
+		self.users.push( user_data );
+		
+		localStorage.setItem( 'users' , JSON.stringify( self.users ) );
+		
+		self.set_users();
+		
+	} // end add_user
+	
+	this.get_owner = function(){
+		
+		for ( var i = 0; i < self.users.length; i++ ){
+			
+			if ( self.users[i].role_id == 1 ){
+				
+				return self.users[i];
+				
+			} // end if
+			
+		} // end for
+		
+		return false;
+		
+	} // end get_owner
+	
+	this.create_user = function(){
+	} // end create_user
+	
+}
+
+var Maggie = function(){
+	
+	this.owner = false;
+	
+	this.account = new Account();
+	
+	this.users = new Users();
+	
+	var self = this;
+	
+	this.get_owner = function(){ return self.owner }
+	
+	this.init = function(){
+		
+		if ( ! self.account.get_acct_id() ){
+			
+			self.account.set_acct();
+			
+			self.users.set_users();
+			
+			var owner_array = self.users.get_owner();
+			
+			if ( owner_array ){
+			
+				self.owner = new User();
+				
+				self.owner.set_user( owner_array );
+			
+			} // end if
+			
+		} // end if
+		
+	} // end init
+	
+	this.init();
+	
+}
+
+var Onboard = function(){
+	
+	this.maggie = new Maggie();
+	
+	var self = this;
+	
+	this.events = function(){
+		
+		jQuery(document).on('submit','form#new_account' , function( event ){
+			
+			event.preventDefault();
+			
+			var data = jQuery( this ).serialize();
+			
+			self.maggie.account.create( data , self.maggie ); 
+			
+		});
+		
+	}
+	
+	this.events();
+	
+}
+var page_onboard = new Onboard();
+
+var Welcome = function(){
+	
+	this.maggie = new Maggie();
+	
+	var self = this;
+	
+}
+var page_welcome = new Welcome();
+
+var Manage_Users = function(){
+	
+	this.create_user_url = 'http://api.maggie.care/user/create/index.php'; 
+	
+	this.users = [];
+	
+	this.maggie = new Maggie();
+	
+	var self = this;
+	
+	this.get_create_user_url = function(){ return self.create_user_url }
+	
+	this.init = function(){
+		
+		jQuery(document).on( 'submit' , 'form#new_user', function( event ){
+			
+			event.preventDefault();
+			
+			var data = jQuery( this ).serialize();
+			
+			jQuery.post(
+				self.get_create_user_url(),
+				data,
+				function( response ){
+					
+					console.log( response );
+					
+					self.maggie.users.save_user( response );
+					
+					var user = new User();
+					
+					user.set_user( response );
+					
+					jQuery('#user-set').prepend( self.the_user( user ) );
+					
+				},'json'
+			);	
+			
+			
+		});
+		
+		jQuery(document).ready( function(){
+			
+			var form = jQuery('#new_user');
+			
+			form.find( 'input[name="api_key"]').val( self.maggie.account.get_api_key() );
+			
+			form.find( 'input[name="acct_id"]').val( self.maggie.account.get_acct_id() );
+			
+		})
+		
+	} // end init
+	
+	this.the_users = function(){
+		
+		var html = '';
+		
+		self.set_users();
+		
+		for( var u = 0; u < self.users.length; u++ ){
+			
+			html += self.the_user( self.users[u] );
+			
+		}
+		
+		return html;
+		
+	}
+	
+	this.the_user = function( user ){
+	
+		
+		html = '<li>' + user.get_name() + '</li>';
+		
+		return html;
+		
+	} // end the_user
+	
+	this.set_users = function(){
+		
+		var users = self.maggie.users.get_users();
+		
+		if ( users ){
+		
+			for( var i = 0; i < users.length; i++ ){
+				
+				var user = new User();
+				
+				user.set_user( users[i] );
+				
+				this.users.push( user );
+				
+			} // end for
+		
+		} // end if
+		
+	} // end the usres
+	
+	this.init();
+	
+}
+var page_manage_users = new Manage_Users();
+
+
+
+	
+	/*init: function(){
 		
 		Maggie.forms.init();
 		
 		Maggie.forms.update();
+	},
+	
+	account: {
+		
+		
+		
 	},
 	
 	data: {
@@ -171,10 +511,96 @@ var Maggie = {
 			
 		} // end updated
 		
-	}
+	}*/
 
+//}
+
+
+
+
+/*var Account = {
+	
+	acct_id:'',
+		
+	api_key:'',
+	
+	salt:'',
+	
+	get: function() {
+	},
+	
+	set: function( acct ){
+	},
 }
-Maggie.init();
+
+var User = {
+	
+	user_id:'',
+	
+	name:'',
+	
+	get:function( id ){
+	},
+	
+	set:function( user ){
+	}
+	
+}*/
+
+
 </script>
+<style>
+body {
+	background: #282D41;
+}
+.maggie-section {
+	background: #fff;
+	max-width: 300px;
+	min-height: 300px;
+	margin: 50px auto;
+	text-align: center;
+	padding: 100px 2rem;
+}
+.clear-account {
+	display: inline-block;
+	color: #fff;
+	text-decoration: none;
+	padding: 0.5rem 2rem;
+	background: #7174F9;
+	margin-top: 1rem;
+}
+</style>
+</head>
+
+<body>
+<div class="maggie-section">
+<form id="new_account" action="/account/create/index.php" method="post">
+	<h2>Add Account</h2>
+    <input type="text" name="name" value="" placeholder="Your Name" /><br />
+	<input type="hidden" name="api_key" value="{TQ$4oYQhLb9Z20-1a0jG;kK8;=3DY" />
+	<input type="submit" value="Create Account">
+</form>
+<a href="#" class="clear-account">Delete Local Data</a>
+</div>
+
+<div class="maggie-section" id="account">
+<h1 id="welcome"><script>var owner = page_welcome.maggie.get_owner(); if ( owner ) document.write( 'Welcome ' + owner.get_name() )</script></h1>
+</div>
+<div class="maggie-section" id="manage-users">
+<form id="new_user" action="/user/create/index.php" method="post">
+	<h2>Add User</h2>
+    <input type="text" name="name" value="" placeholder="Name" /><br />
+    <input type="text" name="phone" value="" placeholder="Phone Number" /><br />
+	<input type="hidden" name="api_key" value="" />
+    <input type="hidden" name="acct_id" value="" />
+	<input type="submit" value="Create User">
+</form>
+<ul id="user-set">
+<script>
+	document.write( page_manage_users.the_users() );
+</script>
+</ul>
+</div>
+
 </body>
 </html>

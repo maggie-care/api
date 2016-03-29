@@ -33,7 +33,7 @@ class User {
 		
 		$this->phone = ( empty( $settings['phone'] ) ) ? '' : $settings['phone'];
 		
-		$this->role_id = ( empty( $settings['role'] ) ) ? 3 : $settings['role'];
+		$this->role_id = ( empty( $settings['role'] ) ) ? 4 : $settings['role'];
 		
 		$this->api_key = md5(microtime().rand());
 		

@@ -11,17 +11,19 @@ class Account {
 	//@var string
 	protected $salt;
 	
-	
 	public function get_acct_id(){ return $this->acct_id; }
 	public function get_api_key(){ return $this->api_key; }
 	public function get_salt(){ return $this->salt;}
 	
-	public function get_account_array(){
+	public function get_account_array( $owner_id = false ){
 		$data = array(
 			'acct_id' => $this->get_acct_id(),
 			'api_key' => $this->get_api_key(),
 			'salt'    => $this->get_salt(),
 		);
+		
+		if ( $owner_id ) $data['owner_id'] = $owner_id;
+		
 		return $data;
 		
 	} // end get_user_data
