@@ -35,6 +35,53 @@ var Maggie = {
 		Maggie.forms.update();
 	},
 	
+	data: {
+		
+		account: {
+			
+			acct_id:'',
+		
+			api_key:'',
+		
+			salt:'',
+		},
+		
+		users: [
+			
+			{ 'user_id':'','name':'','role_id':'' },
+		],
+		
+		set_account:function( response , source ){
+			
+			if( 'account' in response ) {
+				
+				if ( 'acct_id' in response.account ){
+					
+					Maggie.data.account.acct_id = response.account.acct_id;
+				 
+				} // end if
+				
+				if ( 'api_key' in response.account ){
+					
+					Maggie.data.account.api_key = response.account.api_key;
+				 
+				} // end if
+				
+				if ( 'salt' in response.account ){
+					
+					Maggie.data.account.salt = response.account.salt;
+				 
+				} // end if
+				
+				localStorage.setItem( 'account' , JSON.stringify( Maggie.data.account ) ); 
+				
+			} // end if
+			
+		}
+		
+		
+	},
+	
 	forms: {
 		
 		init:function(){
@@ -54,17 +101,13 @@ var Maggie = {
 				data,
 				function( response ){
 					
-					if ( form.attr('id') == 'new_user' ){
-					} else {
-					}
+					console.log( response );
 					
-					alert( response );
+					Maggie.local.update( response );
 					
-					//Maggie.local.update( response );
+					Maggie.forms.update();
 					
-					//Maggie.forms.update();
-					
-				}//,'json'
+				},'json'
 			);	
 			
 		},

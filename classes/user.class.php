@@ -13,12 +13,15 @@ class User {
 	
 	//@var string
 	protected $api_key;
-
 	
+	//@var int
+	protected $role_id;
+
 	
 	public function get_user_id(){ return $this->user_id; }
 	public function get_name(){ return $this->name; }
 	public function get_phone(){ return $this->phone;}
+	public function get_role_id(){ return $this->role_id;}
 
 	/**
 	 * Create user
@@ -80,41 +83,19 @@ class User {
 			
 		}// end if
 		
-		/*if ( $authorize->check_api_key( $_POST['api_key'] ) ){
-			
-			require_once 'connect.class.php';
-			
-			$dbconn = new Connect();
-			
-			$mysqli = $dbconn->connect('api');
-			
-			$this->api_key = md5(microtime().rand());
-		
-			$this->salt = uniqid( mt_rand() , true );
-			
-			$sql = "INSERT INTO maggiecare_acct (api_key,salt,open) VALUES ('$this->api_key','$this->salt',now())";
-			
-			if ( $mysqli->query( $sql ) === TRUE ) {
-				
-				$this->id = $mysqli->insert_id;
-				
-			} else {
-				
-				$this->id = false;
-				
-			} // end if
-			
-			$mysqli->close();
-			
-		} else {
-			
-			echo 'Sorry - Invalid Request';
-			
-			die();
-			
-		}// end if*/
-		
 	} // end create_user
+	
+	public function get_user_array(){
+		$data = array(
+			'user_id' => $this->get_user_id(),
+			'name'    => $this->get_name(),
+			'phone'   => $this->get_phone(),
+			'role_id' => $this->get_role_id(),
+		);
+		
+		return $data;
+		
+	} // end get_user_data
 	
 } // end User
 

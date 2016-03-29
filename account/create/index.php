@@ -11,7 +11,7 @@ class Account_Create {
 	
 	public function __construct(){
 		
-		$account_info = array();
+		$data = array();
 		
 		$this->account = new Account();
 		
@@ -31,19 +31,13 @@ class Account_Create {
 			
 			$user->create_user( $this->account->get_acct_id() , $this->account->get_api_key() , $user_settings );
 		
-			$account_info['acct_id'] = $this->account->get_acct_id();
+			$data['account'] = $this->account->get_account_array();
 			
-			$account_info['api_key'] = $this->account->get_api_key();
-			
-			$account_info['salt'] = $this->account->get_salt();
-			
-			$account_info['user_id'] = $user->get_user_id();
-			
-			$account_info['user_name'] = $user->get_name();
+			$data['users'][] = $user->get_user_array();
 		
 		} // end if
 		
-		echo json_encode( $account_info );
+		echo json_encode( $data );
 		
 	} // end __construct
 	

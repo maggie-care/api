@@ -15,6 +15,16 @@ class Account {
 	public function get_acct_id(){ return $this->acct_id; }
 	public function get_api_key(){ return $this->api_key; }
 	public function get_salt(){ return $this->salt;}
+	
+	public function get_account_array(){
+		$data = array(
+			'acct_id' => $this->get_acct_id(),
+			'api_key' => $this->get_api_key(),
+			'salt'    => $this->get_salt(),
+		);
+		return $data;
+		
+	} // end get_user_data
 
 	/**
 	 * Create an account
