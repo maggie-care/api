@@ -4,10 +4,67 @@
  * @author Danial Bleile
  * @version 0.0.1
  */
-class Authorize {
+
+require_once 'connect.class.php';
+ 
+class Authorize extends Connect{
 	
 	//@var
 	private $api_key = '{TQ$4oYQhLb9Z20-1a0jG;kK8;=3DY';
+	
+	public function authorize_acct( $acct_id , $api_key ){
+		
+		if ( $acct_id && $api_key ){
+			
+			$mysqli = $this->connect('api');
+		
+			$acct = $this->query_acct( $mysqli , $acct_id );
+			
+			if ( $api_key == $acct['api_key'] ){
+				
+				$mysqli->close();
+				
+				return true;
+				
+			} else {
+				
+				$mysqli->close();
+				
+				die( 'Invalid Request');
+				
+			}
+			
+			
+		
+		} else {
+			
+			die( 'Invalid Request');
+			
+		}// end if
+		
+	} // endn
+	
+	private function query_acct( $mysqli , $acct_id ){
+		
+		$sql = "SELECT * FROM maggiecare_acct WHERE id=$acct_id";
+		
+		$query = $mysqli->query( $sql );
+		
+		$row = $query->fetch_assoc();
+		
+		if ( $row ) {
+			
+			return $row;
+			
+		} else {
+			
+			$mysqli->close();
+			
+			die( 'Invalid Request');
+			
+		}// end if
+		
+	}
 	
 	
 	/**

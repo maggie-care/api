@@ -359,6 +359,69 @@ var Manage_Users = function(){
 }
 var page_manage_users = new Manage_Users();
 
+var Request = function(){
+	
+	this.create_request_url = 'http://api.maggie.care/request/create/index.php';
+	
+	this.maggie = new Maggie();
+	
+	var self = this
+	
+	this.init = function(){
+		
+		jQuery(document).on('submit' , 'form#new_request' , function( event ){
+			
+			event.preventDefault();
+			
+			self.create_request( jQuery( this ) );
+			
+		})// end jQuery
+		
+		jQuery(document).ready( function(){
+			
+			var form = jQuery('#new_request');
+			
+			form.find( 'input[name="api_key"]').val( self.maggie.account.get_api_key() );
+			
+			form.find( 'input[name="acct_id"]').val( self.maggie.account.get_acct_id() );
+			
+		})
+		
+	}
+	
+	this.create_request = function( form ){
+		
+		var data = form.serialize();
+		
+		alert( 'start request' );
+			
+		jQuery.post(
+			self.create_request_url,
+			data,
+			function( response ){
+				
+				alert( response );
+				
+				//self.maggie.users.save_user( response );
+				
+				//var user = new User();
+				
+				//user.set_user( response );
+				
+				//jQuery('#user-set').prepend( self.the_user( user ) );
+				
+			}//,'json'
+		);	
+		
+		alert( 'request');
+		
+	} // create_request
+	
+	this.init();
+	
+}
+var page_request = new Request();
+
 
 
 	
@@ -601,6 +664,13 @@ body {
 </script>
 </ul>
 </div>
-
+<div class="maggie-section" id="request">
+<form id="new_request" action="/request/create/index.php" method="post">
+	<h2>Do Request</h2>
+	<input type="hidden" name="api_key" value="" />
+    <input type="hidden" name="acct_id" value="" />
+	<input type="submit" value="Do Request">
+</form>
+</div>
 </body>
 </html>
